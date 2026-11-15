@@ -10,7 +10,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraft.util.datafix.DataFixTypes;
 
 public class TeamSpawnData extends SavedData {
     private static final String DATA_NAME = "teamspawn_data";
@@ -53,9 +52,7 @@ public class TeamSpawnData extends SavedData {
     public static TeamSpawnData get(ServerPlayer player) {
         ServerLevel overworld = player.getServer().overworld();
         DimensionDataStorage storage = overworld.getDataStorage();
-        return storage.computeIfAbsent(
-                new SavedData.Factory<>(TeamSpawnData::new, TeamSpawnData::load, DataFixTypes.LEVEL),
-                DATA_NAME);
+        return storage.computeIfAbsent(TeamSpawnData::load, TeamSpawnData::new, DATA_NAME);
     }
 
     public record SpawnPoint(ResourceKey<Level> dimension, BlockPos pos) {}
