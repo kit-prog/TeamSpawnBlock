@@ -1,4 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
-  "textures": { "all": "teamspawn:block/team_spawn_block" }
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "teamspawn:block/radio_front",
+    "down": "teamspawn:block/radio_bottom",
+    "up": "teamspawn:block/radio_top",
+    "north": "teamspawn:block/radio_front",
+    "south": "teamspawn:block/radio_back",
+    "east": "teamspawn:block/radio_side",
+    "west": "teamspawn:block/radio_side"
+  }
 }
