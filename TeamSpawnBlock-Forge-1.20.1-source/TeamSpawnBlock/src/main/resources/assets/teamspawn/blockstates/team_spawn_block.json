@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "teamspawn:block/team_spawn_block" }
+  }
+}
