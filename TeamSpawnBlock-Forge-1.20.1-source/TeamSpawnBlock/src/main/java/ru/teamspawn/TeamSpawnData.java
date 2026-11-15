@@ -37,6 +37,25 @@ public class TeamSpawnData extends SavedData {
         setDirty();
     }
 
+    public void clearTeamSpawnAt(ResourceKey<Level> dimension, BlockPos beaconPos) {
+        BlockPos spawnPos = beaconPos.above();
+        String dimensionId = dimension.location().toString();
+        boolean changed = false;
+
+        for (String teamName : teamSpawns.getAllKeys()) {
+            CompoundTag entry = teamSpawns.getCompound(teamName);
+            if (dimensionId.equals(entry.getString("Dimension"))
+                    && entry.getInt("X") == spawnPos.getX()
+                    && entry.getInt("Y") == spawnPos.getY()
+                    && entry.getInt("Z") == spawnPos.getZ()) {
+                teamSpawns.remove(teamName);
+                changed = true;
+            }
+        }
+
+        if (changed) setDirty();
+    }
+
     public SpawnPoint getTeamSpawn(String teamName) {
         if (!teamSpawns.contains(teamName, 10)) return null;
         CompoundTag entry = teamSpawns.getCompound(teamName);
