@@ -3,6 +3,7 @@ package ru.teamspawn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
@@ -12,6 +13,14 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TeamSpawnBlock extends Block {
     public TeamSpawnBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+            TeamSpawnData.get(serverPlayer).clearTeamSpawnAt(level.dimension(), pos);
+        }
+        super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override
