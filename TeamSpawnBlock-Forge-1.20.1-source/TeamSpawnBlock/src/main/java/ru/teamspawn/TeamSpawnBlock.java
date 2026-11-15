@@ -3,7 +3,6 @@ package ru.teamspawn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
@@ -16,11 +15,15 @@ public class TeamSpawnBlock extends Block {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            TeamSpawnData.get(serverPlayer).clearTeamSpawnAt(level.dimension(), pos);
+    public void onRemove(BlockState state, Level level, BlockPos pos,
+            BlockState newState, boolean isMoving) {
+        // Called whenever the beacon block is actually removed or replaced,
+        // including removal by explosions and other non-player causes.
+        if (!level.isClientSide && state.getBlock() != newState.getBlock()
+                && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            TeamSpawnData.get(serverLevel).clearTeamSpawnAt(level.dimension(), pos);
         }
-        super.playerWillDestroy(level, pos, state, player);
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

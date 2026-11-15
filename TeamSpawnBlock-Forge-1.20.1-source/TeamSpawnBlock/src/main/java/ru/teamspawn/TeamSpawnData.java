@@ -69,7 +69,11 @@ public class TeamSpawnData extends SavedData {
     }
 
     public static TeamSpawnData get(ServerPlayer player) {
-        ServerLevel overworld = player.getServer().overworld();
+        return get(player.getServer().overworld());
+    }
+
+    public static TeamSpawnData get(ServerLevel level) {
+        ServerLevel overworld = level.getServer().overworld();
         DimensionDataStorage storage = overworld.getDataStorage();
         return storage.computeIfAbsent(TeamSpawnData::load, TeamSpawnData::new, DATA_NAME);
     }
