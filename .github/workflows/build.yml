@@ -28,9 +28,12 @@ jobs:
         with:
           gradle-version: '8.1.1'
 
+      - name: Show Gradle version
+        run: gradle --version
+
       - name: Build mod
         working-directory: TeamSpawnBlock-Forge-1.20.1-source/TeamSpawnBlock
-        run: gradle build --no-daemon
+        run: gradle build
 
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
