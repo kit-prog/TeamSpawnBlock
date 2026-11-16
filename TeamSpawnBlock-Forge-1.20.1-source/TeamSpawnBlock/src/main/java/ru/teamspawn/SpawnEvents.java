@@ -23,6 +23,15 @@ public class SpawnEvents {
         if (targetLevel == null) return;
 
         var pos = spawn.pos();
+        // If the shared spawn is obstructed, leave the player at vanilla spawn,
+        // similar to Minecraft's bed respawn obstruction behavior.
+        if (!targetLevel.getBlockState(pos).isAir()
+                || !targetLevel.getBlockState(pos.above()).isAir()) {
+            player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
+                    "§cКомандная точка возрождения заблокирована! Освободите место над маяком."));
+            return;
+        }
+
         player.teleportTo(targetLevel, pos.getX() + 0.5, pos.getY(),
                 pos.getZ() + 0.5, player.getYRot(), player.getXRot());
     }

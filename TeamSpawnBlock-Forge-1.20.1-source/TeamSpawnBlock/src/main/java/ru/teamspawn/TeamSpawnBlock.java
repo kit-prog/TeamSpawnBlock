@@ -17,8 +17,6 @@ public class TeamSpawnBlock extends Block {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos,
             BlockState newState, boolean isMoving) {
-        // Called whenever the beacon block is actually removed or replaced,
-        // including removal by explosions and other non-player causes.
         if (!level.isClientSide && state.getBlock() != newState.getBlock()
                 && level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
             TeamSpawnData.get(serverLevel).clearTeamSpawnAt(level.dimension(), pos);
@@ -34,19 +32,26 @@ public class TeamSpawnBlock extends Block {
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
 
+        // Like a bed: there must be room for a player to stand at the spawn.
         BlockPos spawnPos = pos.above();
-        var team = serverPlayer.getTeam();
+        if (!level.getBlockState(spawnPos).isAir()
+                || !level.getBlockState(spawnPos.above()).isAir()) {
+            serverPlayer.sendSystemMessage(Component.literal(
+                    "§cТочка возрождения заблокирована! Освободи два блока над маяком."));
+            return InteractionResult.CONSUME;
+        }
 
+        var team = serverPlayer.getTeam();
         if (team != null) {
             TeamSpawnData.get(serverPlayer).setTeamSpawn(
                     team.getName(), level.dimension(), spawnPos);
             serverPlayer.sendSystemMessage(Component.literal(
-                    "§aТочка спавна установлена для команды: " + team.getName()));
+                    "§aТочка возрождения команды установлена! Все участники команды будут появляться здесь."));
         } else {
             serverPlayer.setRespawnPosition(
                     level.dimension(), spawnPos, serverPlayer.getYRot(), true, true);
             serverPlayer.sendSystemMessage(Component.literal(
-                    "§aТвоя личная точка спавна установлена!"));
+                    "§aТвоя личная точка возрождения установлена!"));
         }
         return InteractionResult.CONSUME;
     }
