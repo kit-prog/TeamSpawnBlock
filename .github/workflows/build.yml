@@ -31,9 +31,22 @@ jobs:
       - name: Show Gradle version
         run: gradle --version
 
-      - name: Build mod
+      - name: Build mod (retry on temporary Maven timeouts)
         working-directory: TeamSpawnBlock-Forge-1.20.1-source/TeamSpawnBlock
-        run: gradle build
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            echo "Build attempt $attempt of 3"
+            if gradle build --no-daemon; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Build failed; waiting 20 seconds before retry..."
+              sleep 20
+            fi
+          done
+          echo "Build failed after 3 attempts."
+          exit 1
 
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
