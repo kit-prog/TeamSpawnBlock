@@ -1,7 +1,10 @@
 package ru.teamspawn;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,17 +25,26 @@ public class SpawnEvents {
         ServerLevel targetLevel = player.getServer().getLevel(spawn.dimension());
         if (targetLevel == null) return;
 
-        var pos = spawn.pos();
-        // If the shared spawn is obstructed, leave the player at vanilla spawn,
-        // similar to Minecraft's bed respawn obstruction behavior.
-        if (!targetLevel.getBlockState(pos).isAir()
-                || !targetLevel.getBlockState(pos.above()).isAir()) {
-            player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
-                    "§cКомандная точка возрождения заблокирована! Освободите место над маяком."));
+        BlockPos spawnPos = spawn.pos();
+        BlockPos beaconPos = spawnPos.below();
+
+        // The team can use this shared spawn only while its assigned beacon
+        // is physically present at the saved location.
+        if (!targetLevel.getBlockState(beaconPos).is( ModBlocks.TEAM_SPAWN_BLOCK.get())) {
+            player.sendSystemMessage(Component.literal(
+                    "§eКомандный маяк уничтожен. Ты возродился на обычном спавне мира."));
+            return; // Keep vanilla respawn location (world spawn).
+        }
+
+        // Bed-like obstruction check: two clear blocks above the beacon.
+        if (!targetLevel.getBlockState(spawnPos).isAir()
+                || !targetLevel.getBlockState(spawnPos.above()).isAir()) {
+            player.sendSystemMessage(Component.literal(
+                    "§cКомандная точка возрождения заблокирована! Ты возродился на обычном спавне мира."));
             return;
         }
 
-        player.teleportTo(targetLevel, pos.getX() + 0.5, pos.getY(),
-                pos.getZ() + 0.5, player.getYRot(), player.getXRot());
+        player.teleportTo(targetLevel, spawnPos.getX() + 0.5, spawnPos.getY(),
+                spawnPos.getZ() + 0.5, player.getYRot(), player.getXRot());
     }
 }
