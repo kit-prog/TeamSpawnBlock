@@ -1,20 +1,8 @@
-buildscript {
-    repositories {
-        // Resolve common Java libraries from Maven Central first.
-        // Forge's Maven can publish partial mirrors of these artifacts.
-        mavenCentral()
-        maven {
-            url = 'https://maven.minecraftforge.net/'
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.26'
-    }
+plugins {
+    id 'net.minecraftforge.gradle' version '6.0.36'
+    id 'eclipse'
+    id 'maven-publish'
 }
-
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'net.minecraftforge.gradle'
 
 group = 'ru.teamspawn'
 version = '1.0.0'
